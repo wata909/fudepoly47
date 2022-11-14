@@ -1,0 +1,147 @@
+
+<html>
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+        <link rel="stylesheet" href="index.css" />
+        <script src="https://unpkg.com/underscore@1.13.1/underscore-min.js"></script>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/flatgeobuf@3.22.0/dist/flatgeobuf-geojson.min.js"></script>
+        <script src="https://unpkg.com/json-formatter-js"></script>
+    
+        <style>
+            #map { height: 900px; }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <script>
+            document.addEventListener("DOMContentLoaded", async () => { 
+                // basic OSM Leaflet map
+                let map = L.map('map').setView([36.0274, 140.1104], 14);
+                L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
+                    maxZoom: 18,
+                    minZoom: 7,
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+    
+                // optionally show some meta-data about the FGB file
+                function handleHeaderMeta(headerMeta) {
+                    const header = document.getElementById('header')
+                    const formatter = new JSONFormatter(headerMeta, 10)
+                    while (header.firstChild)
+                        header.removeChild(header.firstChild)
+                    header.appendChild(formatter.render())
+                }
+    
+                // For the example, we fix a visible Rect in the middle of the map
+                function getBoundForRect() {
+                    const bounds = map.getBounds();
+    
+                    const width = map.distance(bounds.getNorthWest(), bounds.getNorthEast());
+                    const height = map.distance(bounds.getNorthWest(), bounds.getSouthWest());
+                    return map.getCenter().toBounds(Math.min(width, height) * 0.8);
+                }
+    
+                // convert the rect into the format flatgeobuf expects
+                function fgBoundingBox() {
+                    const bounds = getBoundForRect();
+                    return {
+                        minX: bounds.getWest(),
+                        maxX: bounds.getEast(),
+                        minY: bounds.getSouth(),
+                        maxY: bounds.getNorth(),
+                    };
+                }
+    
+                // show a leaflet rect corresponding to our bounding box
+                let rectangle = L.rectangle(getBoundForRect(), { interactive: false, color: "blue", fillOpacity: 0.0, opacity: 1.0 }).addTo(map);
+    
+                // track the previous results so we can remove them when adding new results
+                let previousResults = L.layerGroup().addTo(map);
+                async function updateResults() {
+                    // remove the old results
+                    previousResults.remove();
+                    const nextResults = L.layerGroup().addTo(map);
+                    previousResults = nextResults;
+    
+                    // Use flatgeobuf JavaScript API to iterate features as geojson.
+                    // Because we specify a bounding box, flatgeobuf will only fetch the relevant subset of data,
+                    // rather than the entire file.
+                    const iter = flatgeobuf.deserialize('./fude_tsukuba.fgb', fgBoundingBox(), handleHeaderMeta);
+    
+                    const colorScale = ((d) => {
+                        return d > 199  ? '#8b4513' :
+                            d > 99 ? '#FFFF00' :
+                            '#000000'
+                    });
+    
+                    for await (const feature of iter) {
+                        // Leaflet styling
+                        const defaultStyle = { 
+                            color: colorScale(feature.properties["land_type"]), 
+                            weight: 1, 
+                            fillOpacity: 0.4,
+                        };
+                        L.geoJSON(feature, {
+                            style: defaultStyle,
+                        }).on({
+                            'mouseover': function(e) {
+                                const layer = e.target;
+                                layer.setStyle({
+                                    weight: 4,
+                                    fillOpacity: 0.8,
+                                });
+                            },
+                            'mouseout': function(e) {
+                                const layer = e.target;
+                                layer.setStyle(defaultStyle);
+                            }
+                       }).bindPopup(`筆ポリゴンID：${feature.properties["polygon_uuid"]}<br />
+                                     地目：${feature.properties["land_type"]}<br />
+                                     市町村コード：${feature.properties["local_government_cd"]}<br />`)
+                       .addTo(nextResults);
+                    }
+                    rectangle.bringToFront();
+                }
+                // if the user is panning around alot, only update once per second max
+                updateResults = _.throttle(updateResults, 1000);
+    
+                // show results based on the initial map
+                updateResults();
+                // ...and update the results whenever the map moves
+                map.on("moveend", function(s){
+                    rectangle.setBounds(getBoundForRect());
+                    updateResults();
+                });
+            });
+        </script>
+        <p>
+            This is a map of every census block in the USA, including its
+            population. The entire file is over 12GB, but FlatGeobuf fetches only
+            the tiny subset of data that intersects with the bounding box (drawn
+            in yellow). Pan the map to move the query's bounding box.
+        </p>
+        <p>
+            When you have feature data that cover a large area in fine-grained
+            detail like this, the typical options are to either manually slice up
+            your file into manageable regions or to rely on running an application
+            server which does this slicing dynamically.
+        </p>
+        <p>
+            Hosting an application has initial complexity and ongoing maintenance
+            costs. Slicing files can be tedious and inevitiably you might be
+            interested in an area on the boundary of slices.
+        </p>
+        <p>
+            For these cases, consider instead using a single indexed FlatGeobuf.
+            Because FlatGeobuf's spatial index allows you to fetch only the data
+            you're interested in, you can keep your page size down while avoiding
+            the tedium of slicing up files manually, or building and maintaining an
+            application server.
+        </p>
+        <div id="header">
+            <h3>Parsed header content</h3>
+        </div>
+    </body>
+    </html>
+    

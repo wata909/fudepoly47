@@ -1,6 +1,7 @@
 
-<html>
+<html lang="ja">
     <head>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
         <link rel="stylesheet" href="index.css" />
         <script src="https://unpkg.com/underscore@1.13.1/underscore-min.js"></script>
@@ -17,11 +18,11 @@
         <script>
             document.addEventListener("DOMContentLoaded", async () => { 
                 // basic OSM Leaflet map
-                let map = L.map('map').setView([36.0274, 140.1104], 14);
+                let map = L.map('map').setView([36.34166667, 140.4469444], 14);
                 L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
                     maxZoom: 18,
-                    minZoom: 7,
-                    attribution: '<a href="https://www.gsi.go.jp/development/ichiran.html#pale">地理院タイル淡色地図</a>&copy; <a href="https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html">国土地理院</a>'
+                    minZoom: 10,
+                    attribution: '<a href="https://www.gsi.go.jp/development/ichiran.html#pale">地理院タイル淡色地図</a>&copy; <a href="https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html">国土地理院</a> |                     <a href="https://www.maff.go.jp/j/tokei/porigon/index.html">筆ポリゴンデータ（2022年度公開）</a>&copy; <a href="https://www.maff.go.jp/">農林水産省</a> '
                 }).addTo(map);
     
                 // optionally show some meta-data about the FGB file
@@ -71,7 +72,7 @@
     
                     const colorScale = ((d) => {
                         return d > 199  ? '#8b4513' :
-                            d > 99 ? '#FFFF00' :
+                            d > 99 ? '#EEEE00' :
                             '#000000'
                     });
     
@@ -116,13 +117,15 @@
             });
         </script>
         <p>
-            このサイトは、農林水産省より公開されている筆ポリゴンを、茨城県を対象に結合し公開したサイトです。
-            実際のファイルは、<a href="fude_2022_08.fgb">茨城県筆ポリゴン結合ファイル（FlatGeobuf形式、約600M）</a>
-            からダウンロード可能です。
+            このサイトは、「筆ポリゴンデータ（2022年度公開）」（農林水産省）を、茨城県を対象に結合し公開したサイトです。<br />
+            実際のファイルは、<a href="fude_2022_08.fgb">茨城県筆ポリゴン結合ファイル（FlatGeobuf形式、約600M）</a>からダウンロード可能です。
         </p>
         <p>
-            データは、ファイル全体をダウロードするのではなく、青い枠の部分のみが読み込まれるため、大容量の
-            ファイルであっても簡便に表示可能です。    
+            データは、ファイル全体をダウロードするのではなく、青い枠の部分のみが読み込まれるため、大容量のファイルであっても簡便に表示可能です。    
+        </p>
+        <p>
+            筆ポリゴンの詳細は<a href="https://www.maff.go.jp/j/tokei/porigon/index.html" target="_other">農地の区画情報（筆ポリゴン）のデータ提供・利用</a>を参照してください。<br />
+            出典：「筆ポリゴンデータ（2022年度公開）」（農林水産省）（2022年11月15日に利用）
         </p>
 
     </body>

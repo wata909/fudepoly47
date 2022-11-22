@@ -15,6 +15,89 @@
         </style>
     </head>
     <body>
+        <H1>筆ポリゴン公開サイト</H1>
+        <p>
+            このサイトは、「筆ポリゴンデータ（2022年度公開）」（農林水産省）をFlatGeobuf形式で都道府県単位で結合し、公開したサイトです。<br />
+            以下のリンクから、都道府県毎の筆ポリゴン閲覧ページに移動できます。
+        </p>
+        <table>
+            <caption>都道府県筆ポリゴンへのリンク</caption>
+    
+                <tbody>
+                    <tr>
+                        <td colspan="2"><a href=index.html>全国</a></td>
+                        <td><a href=fude_2022_31.html>鳥取</a></td>
+                        <td><a href=fude_2022_17.html>石川</a></td>
+                        <td><a href=fude_2022_16.html>富山</a></td>
+                        <td><a href=fude_2022_02.html>青森</a></td>
+                        <td><a href=fude_2022_01.html>北海道</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href=fude_2022_35.html>山口</a></td>
+                        <td><a href=fude_2022_32.html>島根</a></td>
+                        <td><a href=fude_2022_33.html>岡山</a></td>
+                        <td><a href=fude_2022_18.html>福井</a></td>
+                        <td><a href=fude_2022_15.html>新潟</a></td>
+                        <td><a href=fude_2022_05.html>秋田</a></td>
+                        <td><a href=fude_2022_03.html>岩手</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href=fude_2022_42.html>長崎</a></td>
+                        <td><a href=fude_2022_40.html>福岡</a></td>
+                        <td><a href=fude_2022_34.html>広島</a></td>
+                        <td><a href=fude_2022_25.html>滋賀</a></td>
+                        <td><a href=fude_2022_20.html>長野</a></td>
+                        <td><a href=fude_2022_06.html>山形</a></td>
+                        <td><a href=fude_2022_04.html>宮城</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href=fude_2022_41.html>佐賀</a></td>
+                        <td><a href=fude_2022_44.html>大分</a></td>
+                        <td><a href=fude_2022_28.html>兵庫</a></td>
+                        <td><a href=fude_2022_26.html>京都</a></td>
+                        <td><a href=fude_2022_19.html>山梨</a></td>
+                        <td><a href=fude_2022_10.html>群馬</a></td>
+                        <td><a href=fude_2022_07.html>福島</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href=fude_2022_43.html>熊本</a></td>
+                        <td><a href=fude_2022_45.html>宮崎</a></td>
+                        <td><a href=fude_2022_27.html>大阪</a></td>
+                        <td><a href=fude_2022_29.html>奈良</a></td>
+                        <td><a href=fude_2022_21.html>岐阜</a></td>
+                        <td><a href=fude_2022_11.html>埼玉</a></td>
+                        <td><a href=fude_2022_09.html>栃木</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href=fude_2022_46.html>鹿児島</a></td>
+                        <td><a href=fude_2022_38.html>愛媛</a></td>
+                        <td><a href=fude_2022_37.html>香川</a></td>
+                        <td><a href=fude_2022_30.html>和歌山</a></td>
+                        <td><a href=fude_2022_22.html>静岡</a></td>
+                        <td><a href=fude_2022_13.html>東京</a></td>
+                        <td><a href=fude_2022_08.html>茨城</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href=fude_2022_47.html>沖縄</a></td>
+                        <td><a href=fude_2022_39.html>高知</a></td>
+                        <td><a href=fude_2022_36.html>徳島</a></td>
+                        <td><a href=fude_2022_24.html>三重</a></td>
+                        <td><a href=fude_2022_23.html>愛知</a></td>
+                        <td><a href=fude_2022_14.html>神奈川</a></td>
+                        <td><a href=fude_2022_01.html>千葉</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="credit">
+                カラム配置出典：<a href~"https://github.com/tabularmaps/tabularmapsmaker">カラム地図メーカー</a>CC BY 4.0 福野泰介、<a href=https://github.com/tabularmaps/hq>カラム地図 / TabularMaps on Github</a><br>
+            </p>
+
+         <p>
+            以下は全国を対象に結合したファイルの表示サンプルです。<br />
+            データは、ファイル全体をダウロードするのではなく、青い枠の部分のみが読み込まれるため、大容量のファイルであっても簡便に表示可能です。
+            実際のファイルは、<a href="https://habs.rad.naro.go.jp/spatial_data/maff_fude2022/maff_fude2022.fgb">全国筆ポリゴン結合ファイル（FlatGeobuf形式、約17GB）</a>からダウンロード可能です。
+        </p>
+    
         <div id="map"></div>
         <script>
             document.addEventListener("DOMContentLoaded", async () => { 
@@ -117,88 +200,11 @@
                 });
             });
         </script>
-        <p>
-            このサイトは、「筆ポリゴンデータ（2022年度公開）」（農林水産省）を、茨城県を対象に結合し公開したサイトです。<br />
-            実際のファイルは、<a href="https://habs.rad.naro.go.jp/spatial_data/maff_fude2022/maff_fude2022.fgb">全国筆ポリゴン結合ファイル（FlatGeobuf形式、約17GB）</a>からダウンロード可能です。
-        </p>
-        <p>
-            データは、ファイル全体をダウロードするのではなく、青い枠の部分のみが読み込まれるため、大容量のファイルであっても簡便に表示可能です。    
-        </p>
-        <p>
+
+<p>
             筆ポリゴンの詳細は<a href="https://www.maff.go.jp/j/tokei/porigon/index.html" target="_other">農地の区画情報（筆ポリゴン）のデータ提供・利用</a>を参照してください。<br />
             出典：「筆ポリゴンデータ（2022年度公開）」（農林水産省）（2022年11月15日に利用）
         </p>
-        <table>
-            <caption>都道府県筆ポリゴンへのリンク</caption>
-    
-                <tbody>
-                    <tr>
-                        <td colspan="2"><a href=https://habs.rad.naro.go.jp/spatial_data/maff_fude2022/>全国</a></td>
-                        <td><a href=fude_2022_31.html>鳥取</a></td>
-                        <td><a href=fude_2022_17.html>石川</a></td>
-                        <td><a href=fude_2022_16.html>富山</a></td>
-                        <td><a href=fude_2022_02.html>青森</a></td>
-                        <td><a href=fude_2022_01.html>北海道</a></td>
-                    </tr>
-                    <tr>
-                        <td><a href=fude_2022_35.html>山口</a></td>
-                        <td><a href=fude_2022_32.html>島根</a></td>
-                        <td><a href=fude_2022_33.html>岡山</a></td>
-                        <td><a href=fude_2022_18.html>福井</a></td>
-                        <td><a href=fude_2022_15.html>新潟</a></td>
-                        <td><a href=fude_2022_05.html>秋田</a></td>
-                        <td><a href=fude_2022_03.html>岩手</a></td>
-                    </tr>
-                    <tr>
-                        <td><a href=fude_2022_42.html>長崎</a></td>
-                        <td><a href=fude_2022_40.html>福岡</a></td>
-                        <td><a href=fude_2022_34.html>広島</a></td>
-                        <td><a href=fude_2022_25.html>滋賀</a></td>
-                        <td><a href=fude_2022_20.html>長野</a></td>
-                        <td><a href=fude_2022_06.html>山形</a></td>
-                        <td><a href=fude_2022_04.html>宮城</a></td>
-                    </tr>
-                    <tr>
-                        <td><a href=fude_2022_41.html>佐賀</a></td>
-                        <td><a href=fude_2022_44.html>大分</a></td>
-                        <td><a href=fude_2022_28.html>兵庫</a></td>
-                        <td><a href=fude_2022_26.html>京都</a></td>
-                        <td><a href=fude_2022_19.html>山梨</a></td>
-                        <td><a href=fude_2022_10.html>群馬</a></td>
-                        <td><a href=fude_2022_07.html>福島</a></td>
-                    </tr>
-                    <tr>
-                        <td><a href=fude_2022_43.html>熊本</a></td>
-                        <td><a href=fude_2022_45.html>宮崎</a></td>
-                        <td><a href=fude_2022_27.html>大阪</a></td>
-                        <td><a href=fude_2022_29.html>奈良</a></td>
-                        <td><a href=fude_2022_21.html>岐阜</a></td>
-                        <td><a href=fude_2022_11.html>埼玉</a></td>
-                        <td><a href=fude_2022_09.html>栃木</a></td>
-                    </tr>
-                    <tr>
-                        <td><a href=fude_2022_46.html>鹿児島</a></td>
-                        <td><a href=fude_2022_38.html>愛媛</a></td>
-                        <td><a href=fude_2022_37.html>香川</a></td>
-                        <td><a href=fude_2022_30.html>和歌山</a></td>
-                        <td><a href=fude_2022_22.html>静岡</a></td>
-                        <td><a href=fude_2022_13.html>東京</a></td>
-                        <td><a href=fude_2022_08.html>茨城</a></td>
-                    </tr>
-                    <tr>
-                        <td><a href=fude_2022_47.html>沖縄</a></td>
-                        <td><a href=fude_2022_39.html>高知</a></td>
-                        <td><a href=fude_2022_36.html>徳島</a></td>
-                        <td><a href=fude_2022_24.html>三重</a></td>
-                        <td><a href=fude_2022_23.html>愛知</a></td>
-                        <td><a href=fude_2022_01.html>神奈川</a></td>
-                        <td><a href=fude_2022_01.html>千葉</a></td>
-                    </tr>
-                </tbody>
-            </table>
-            <p class="credit">
-                カラム配置出典：<a href~"https://github.com/tabularmaps/tabularmapsmaker">カラム地図メーカー</a>CC BY 4.0 福野泰介、<a href=https://github.com/tabularmaps/hq>カラム地図 / TabularMaps on Github</a><br>
-            </p>
     
     </body>
     </html>

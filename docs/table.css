@@ -1,0 +1,17 @@
+table {
+        border-collapse: separate;
+        width: 80%; 
+        margin: auto; 
+        text-align: center;
+}
+td, th {
+	padding: 10px;
+	width: 50px;
+	height: 25px;
+    border: solid 1.5px #CCCCCC; 
+    border-radius: 10px;
+}
+th {
+	background: #fffafa;
+}
+tr:nth-child(odd) {background-color: #f2f2f2;}

@@ -1,0 +1,205 @@
+
+<html lang="ja">
+    <head>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+        <link rel="stylesheet" href="index.css" />
+        <link rel="stylesheet" href="table.css" />
+        <script src="https://unpkg.com/underscore@1.13.1/underscore-min.js"></script>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/flatgeobuf@3.22.0/dist/flatgeobuf-geojson.min.js"></script>
+        <script src="https://unpkg.com/json-formatter-js"></script>
+    
+        <style>
+            #map { height: 900px; }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <script>
+            document.addEventListener("DOMContentLoaded", async () => { 
+                // basic OSM Leaflet map
+                let map = L.map('map').setView([36.030829, 140.103225], 16);
+                L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
+                    maxZoom: 18,
+                    minZoom: 10,
+                    attribution: '<a href="https://www.gsi.go.jp/development/ichiran.html#pale">地理院タイル淡色地図</a>&copy; <a href="https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html">国土地理院</a> |                     <a href="https://www.maff.go.jp/j/tokei/porigon/index.html">筆ポリゴンデータ（2022年度公開）</a>&copy; <a href="https://www.maff.go.jp/">農林水産省</a> '
+                }).addTo(map);
+    
+                // optionally show some meta-data about the FGB file
+                // function handleHeaderMeta(headerMeta) {
+                //     const header = document.getElementById('header')
+                //     const formatter = new JSONFormatter(headerMeta, 10)
+                //     while (header.firstChild)
+                //         header.removeChild(header.firstChild)
+                //     header.appendChild(formatter.render())
+                // }
+    
+                // For the example, we fix a visible Rect in the middle of the map
+                // function getBoundForRect() {
+                //    const bounds = map.getBounds();
+                //
+                //    const width = map.distance(bounds.getNorthWest(), bounds.getNorthEast());
+                //    const height = map.distance(bounds.getNorthWest(), bounds.getSouthWest());
+                //    return map.getCenter().toBounds(Math.min(width, height) * 0.8);
+                //}
+    
+                // convert the rect into the format flatgeobuf expects
+                //function fgBoundingBox() {
+                //    const bounds = getBoundForRect();
+                //    return {
+                //        minX: bounds.getWest(),
+                //        maxX: bounds.getEast(),
+                //        minY: bounds.getSouth(),
+                //        maxY: bounds.getNorth(),
+                //    };
+                //}
+    
+                // show a leaflet rect corresponding to our bounding box
+                //let rectangle = L.rectangle(getBoundForRect(), { interactive: false, color: "blue", fillOpacity: 0.0, opacity: 1.0 }).addTo(map);
+    
+                // track the previous results so we can remove them when adding new results
+                let previousResults = L.layerGroup().addTo(map);
+                async function updateResults() {
+                    // remove the old results
+                    previousResults.remove();
+                    const nextResults = L.layerGroup().addTo(map);
+                    previousResults = nextResults;
+    
+                    // Use flatgeobuf JavaScript API to iterate features as geojson.
+                    // Because we specify a bounding box, flatgeobuf will only fetch the relevant subset of data,
+                    // rather than the entire file.
+                    const iter = flatgeobuf.deserialize('fude_tsukuba.fgb');
+    
+                    const colorScale = ((d) => {
+                        return d > 199  ? '#8b4513' :
+                            d > 99 ? '#EEEE00' :
+                            '#000000'
+                    });
+    
+                    for await (const feature of iter) {
+                        // Leaflet styling
+                        const defaultStyle = { 
+                            color: colorScale(feature.properties["land_type"]), 
+                            weight: 1, 
+                            fillOpacity: 0.4,
+                        };
+                        L.geoJSON(feature, {
+                            style: defaultStyle,
+                        }).on({
+                            'mouseover': function(e) {
+                                const layer = e.target;
+                                layer.setStyle({
+                                    weight: 4,
+                                    fillOpacity: 0.8,
+                                });
+                            },
+                            'mouseout': function(e) {
+                                const layer = e.target;
+                                layer.setStyle(defaultStyle);
+                            }
+                        }).bindPopup(`筆ポリゴンID：${feature.properties["polygon_uuid"]}<br />
+                                     地目：${feature.properties["land_type"]}<br />
+                                     市町村コード：${feature.properties["local_government_cd"]}<br />`)
+                       .addTo(nextResults);
+                    }
+                    rectangle.bringToFront();
+                }
+                // if the user is panning around alot, only update once per second max
+                updateResults = _.throttle(updateResults, 1000);
+    
+                // show results based on the initial map
+                updateResults();
+                // ...and update the results whenever the map moves
+                map.on("moveend", function(s){
+                    rectangle.setBounds(getBoundForRect());
+                    updateResults();
+                });
+            });
+        </script>
+        <p>
+            このページは、「筆ポリゴンデータ（2022年度公開）」（農林水産省）の茨城県つくば市の表示サンプルです。<br />
+            上図の青枠のみデータをダウンロードして表示しています。<br />
+            実際のファイルは、<a href="fude_tsukuba.fgb">つくば市筆ポリゴンファイル（FlatGeobuf形式、約M）</a>からダウンロード可能です。
+        </p>
+        <p>
+            データは、ファイル全体をダウロードするのではなく、青い枠の部分のみが読み込まれるため、大容量のファイルであっても簡便に表示可能です。    
+        </p>
+        <p>
+            筆ポリゴンの詳細は<a href="https://www.maff.go.jp/j/tokei/porigon/index.html" target="_other">農地の区画情報（筆ポリゴン）のデータ提供・利用</a>を参照してください。<br />
+            出典：「筆ポリゴンデータ（2022年度公開）」（農林水産省）（2022年11月15日に利用）
+        </p>
+        <table>
+        <caption>都道府県筆ポリゴンへのリンク</caption>
+
+            <tbody>
+                <tr>
+                    <td colspan="2"><a href=index.html>全国</a></td>
+                    <td><a href=fude_2022_31.html>鳥取</a></td>
+                    <td><a href=fude_2022_17.html>石川</a></td>
+                    <td><a href=fude_2022_16.html>富山</a></td>
+                    <td><a href=fude_2022_02.html>青森</a></td>
+                    <td><a href=fude_2022_01.html>北海道</a></td>
+                </tr>
+                <tr>
+                    <td><a href=fude_2022_35.html>山口</a></td>
+                    <td><a href=fude_2022_32.html>島根</a></td>
+                    <td><a href=fude_2022_33.html>岡山</a></td>
+                    <td><a href=fude_2022_18.html>福井</a></td>
+                    <td><a href=fude_2022_15.html>新潟</a></td>
+                    <td><a href=fude_2022_05.html>秋田</a></td>
+                    <td><a href=fude_2022_03.html>岩手</a></td>
+                </tr>
+                <tr>
+                    <td><a href=fude_2022_42.html>長崎</a></td>
+                    <td><a href=fude_2022_40.html>福岡</a></td>
+                    <td><a href=fude_2022_34.html>広島</a></td>
+                    <td><a href=fude_2022_25.html>滋賀</a></td>
+                    <td><a href=fude_2022_20.html>長野</a></td>
+                    <td><a href=fude_2022_06.html>山形</a></td>
+                    <td><a href=fude_2022_04.html>宮城</a></td>
+                </tr>
+                <tr>
+                    <td><a href=fude_2022_41.html>佐賀</a></td>
+                    <td><a href=fude_2022_44.html>大分</a></td>
+                    <td><a href=fude_2022_28.html>兵庫</a></td>
+                    <td><a href=fude_2022_26.html>京都</a></td>
+                    <td><a href=fude_2022_19.html>山梨</a></td>
+                    <td><a href=fude_2022_10.html>群馬</a></td>
+                    <td><a href=fude_2022_07.html>福島</a></td>
+                </tr>
+                <tr>
+                    <td><a href=fude_2022_43.html>熊本</a></td>
+                    <td><a href=fude_2022_45.html>宮崎</a></td>
+                    <td><a href=fude_2022_27.html>大阪</a></td>
+                    <td><a href=fude_2022_29.html>奈良</a></td>
+                    <td><a href=fude_2022_21.html>岐阜</a></td>
+                    <td><a href=fude_2022_11.html>埼玉</a></td>
+                    <td><a href=fude_2022_09.html>栃木</a></td>
+                </tr>
+                <tr>
+                    <td><a href=fude_2022_46.html>鹿児島</a></td>
+                    <td><a href=fude_2022_38.html>愛媛</a></td>
+                    <td><a href=fude_2022_37.html>香川</a></td>
+                    <td><a href=fude_2022_30.html>和歌山</a></td>
+                    <td><a href=fude_2022_22.html>静岡</a></td>
+                    <td><a href=fude_2022_13.html>東京</a></td>
+                    <td><a href=fude_2022_08.html>茨城</a></td>
+                </tr>
+                <tr>
+                    <td><a href=fude_2022_47.html>沖縄</a></td>
+                    <td><a href=fude_2022_39.html>高知</a></td>
+                    <td><a href=fude_2022_36.html>徳島</a></td>
+                    <td><a href=fude_2022_24.html>三重</a></td>
+                    <td><a href=fude_2022_23.html>愛知</a></td>
+                    <td><a href=fude_2022_14.html>神奈川</a></td>
+                    <td><a href=fude_2022_01.html>千葉</a></td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="credit">
+            カラム配置出典：カラム地図メーカー CC BY <a href=https://github.com/tabularmaps/hq>カラム地図 / TabularMaps on Github</a><br>
+        </p>
+        </body>
+    </html>
+    

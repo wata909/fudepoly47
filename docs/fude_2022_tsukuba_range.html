@@ -69,7 +69,7 @@
                     // Use flatgeobuf JavaScript API to iterate features as geojson.
                     // Because we specify a bounding box, flatgeobuf will only fetch the relevant subset of data,
                     // rather than the entire file.
-                    const iter = flatgeobuf.deserialize('./fude_2022_tsukuba_range.fgb', fgBoundingBox());
+                    const iter = flatgeobuf.deserialize('fude_tsukuba.fgb', fgBoundingBox());
     
                     const colorScale = ((d) => {
                         return d > 199  ? '#8b4513' :
